@@ -10,6 +10,6 @@ inspo from [@codycollier](https://x.com/codycollier)
 2. [get the userscript](https://raw.githubusercontent.com/n4f3y/x-minimal/main/x-minimal.user.js) and click **install** when prompted
 3. reload x.com
 
-## before and after
+## visual
 
 ![same demo feed, standard x above and x-minimal below](before-after-stacked.png)
