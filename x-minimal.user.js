@@ -19,6 +19,9 @@
   const nav = ':is(header, [role="banner"]) nav'
   const compose = '[data-testid="SideNav_NewTweet_Button"]'
   const account = '[data-testid="SideNav_AccountSwitcher_Button"]'
+  const profileLink = '[data-testid="AppTabBar_Profile_Link"]'
+  const minimal = 'html:not([data-xmin-native])'
+  const nativeRoute = /^\/(?:settings|account|messages|chat|i\/(?:chat|messages|grok|jf\/grok|flow|premium|verified-choose|monetization))(?:\/|$)/
   const font = 'TwitterChirp, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
   const postTools = ':is([data-testid="caret"], [data-testid^="grok" i], button[aria-label="More" i][aria-haspopup="menu"], button[aria-label*="grok actions" i], button[aria-label^="ask grok" i])'
   const cell = '[data-testid="cellInnerDiv"]'
@@ -34,24 +37,24 @@
 
   GM_addStyle(`
     :root { --xmin-label-size: 14px; --xmin-label-opacity: .8 }
-    html:not([data-xmin-chat]) [data-testid="sidebarColumn"],
-    html:not([data-xmin-chat]) :is([data-testid="chat-drawer-root"], [data-testid="xchatEmbedDrawer"]),
-    [data-testid="GrokDrawer"], ${tweet} ${postTools},
+    ${minimal} [data-testid="sidebarColumn"],
+    ${minimal} :is([data-testid="chat-drawer-root"], [data-testid="xchatEmbedDrawer"]),
+    ${minimal} [data-testid="GrokDrawer"], ${minimal} ${tweet} ${postTools},
     html[data-xmin-post] ${primary} ${postTools} { display: none !important }
-    [data-xmin-tab-header] { position: relative !important; inset: auto !important; backdrop-filter: none !important }
-    [data-xmin-duplicate-rule], [role="tooltip"], [data-testid="HoverLabel"] { display: none !important }
-    html:not([data-xmin-chat]) ${primary} { border-inline-width: 0 !important }
+    ${minimal} [data-xmin-tab-header] { position: relative !important; inset: auto !important; backdrop-filter: none !important }
+    ${minimal} :is([data-xmin-duplicate-rule], [role="tooltip"], [data-testid="HoverLabel"]) { display: none !important }
+    ${minimal} ${primary} { border-inline-width: 0 !important }
     html[data-xmin-home] [data-xmin-composer] { display: none !important }
 
-    html:not([data-xmin-chat]) :is([data-xmin-rail] ${account}, [data-xmin-logo], [data-xmin-rail] [data-testid="AppTabBar_More_Menu"]) { display: none !important }
-    html:not([data-xmin-chat]) :is([data-xmin-frame], [data-xmin-content], [data-xmin-lane], :where(${primary}[data-xmin-content] > div, ${primary}[data-xmin-content] ${cell})) {
+    ${minimal} :is([data-xmin-rail] ${account}, [data-xmin-logo], [data-xmin-rail] [data-testid="AppTabBar_More_Menu"]) { display: none !important }
+    ${minimal} :is([data-xmin-frame], [data-xmin-content], [data-xmin-lane], :where(${primary}[data-xmin-content] > div, ${primary}[data-xmin-content] ${cell})) {
       box-sizing: border-box !important;
       width: 100% !important;
       min-width: 0 !important;
       max-width: none !important;
       margin-inline: 0 !important;
     }
-    html:not([data-xmin-chat]) [data-xmin-shell] {
+    ${minimal} [data-xmin-shell] {
       box-sizing: border-box !important;
       --xmin-visible-gap: 12%;
       --xmin-gap: max(0%, calc(var(--xmin-visible-gap) - var(--xmin-post-inset, 0%)));
@@ -64,10 +67,10 @@
       grid-template-columns: var(--xmin-nav) clamp(2%, calc(100% - var(--xmin-nav) - var(--xmin-feed)), var(--xmin-gap)) var(--xmin-feed) !important;
       align-items: stretch !important;
     }
-    html:not([data-xmin-chat]) [data-xmin-rail] { grid-column: 1; grid-row: 1 }
-    html:not([data-xmin-chat]) [data-xmin-main] { grid-column: 3; grid-row: 1 }
-    html:not([data-xmin-chat]) [data-xmin-rail],
-    html:not([data-xmin-chat]) [data-xmin-dock] {
+    ${minimal} [data-xmin-rail] { grid-column: 1; grid-row: 1 }
+    ${minimal} [data-xmin-main] { grid-column: 3; grid-row: 1 }
+    ${minimal} [data-xmin-rail],
+    ${minimal} [data-xmin-dock] {
       box-sizing: border-box !important;
       width: 100% !important;
       min-width: 0 !important;
@@ -76,11 +79,11 @@
       margin-inline: 0 !important;
       padding-inline: 0 !important;
     }
-    html:not([data-xmin-chat]) [data-xmin-dock="fixed"] {
+    ${minimal} [data-xmin-dock="fixed"] {
       width: max-content !important;
       inset-inline: auto !important;
     }
-    html:not([data-xmin-chat]) [data-xmin-nav] {
+    ${minimal} [data-xmin-nav] {
       width: max-content !important;
       min-width: 0 !important;
       display: grid !important;
@@ -91,12 +94,13 @@
       padding: var(--xmin-nav-top, 0%) 0 0 !important;
       font: 400 var(--xmin-label-size)/1.4 ${font} !important;
     }
-    html:not([data-xmin-chat]) [data-xmin-nav] > :not([data-xmin-label]),
-    html:not([data-xmin-chat]) [data-xmin-write-source] { display: none !important }
-    html:not([data-xmin-chat]) [data-xmin-nav] > [data-xmin-label] {
+    ${minimal} [data-xmin-nav] > :not([data-xmin-label]),
+    ${minimal} [data-xmin-write-source] { display: none !important }
+    ${minimal} [data-xmin-nav] > [data-xmin-label] {
       box-sizing: border-box !important;
       display: grid !important;
       grid-column: 1 / -1;
+      order: var(--xmin-nav-order, 0);
       grid-template-columns: subgrid;
       grid-template-rows: 100%;
       grid-auto-rows: 0;
@@ -115,13 +119,13 @@
       line-height: 0 !important;
       text-decoration: none;
     }
-    html:not([data-xmin-chat]) [data-xmin-nav] > [data-xmin-label] > :not([data-xmin-text]) { display: none !important }
-    html:not([data-xmin-chat]) [data-xmin-text] { grid-area: 1 / 1; font: 400 var(--xmin-label-size)/1 ${font} }
-    html:not([data-xmin-chat]) [data-xmin-text="label"] { opacity: var(--xmin-label-opacity) }
-    html:not([data-xmin-chat]) [data-xmin-text="hint"]:not(:empty) { grid-column: 2; margin-inline-start: .6em; opacity: .6 }
-    html:not([data-xmin-chat]) [data-xmin-nav] > [data-xmin-label]:hover,
-    html:not([data-xmin-chat]) [data-xmin-nav] [data-xmin-text] { text-decoration: none !important }
-    html[data-xmin-chat] [data-xmin-link] { display: none !important }
+    ${minimal} [data-xmin-nav] > [data-xmin-label] > :not([data-xmin-text]) { display: none !important }
+    ${minimal} [data-xmin-text] { grid-area: 1 / 1; font: 400 var(--xmin-label-size)/1 ${font} }
+    ${minimal} [data-xmin-text="label"] { opacity: var(--xmin-label-opacity) }
+    ${minimal} [data-xmin-text="hint"]:not(:empty) { grid-column: 2; margin-inline-start: .6em; opacity: .6 }
+    ${minimal} [data-xmin-nav] > [data-xmin-label]:hover,
+    ${minimal} [data-xmin-nav] [data-xmin-text] { text-decoration: none !important }
+    html[data-xmin-native] :is([data-xmin-link], [data-xmin-text], [data-xmin-delete-post], [data-xmin-mute-author], [data-xmin-fallback-save]) { display: none !important }
 
     ${postMetadata} {
       display: flex !important;
@@ -139,8 +143,8 @@
     }
     ${postMetadata}, ${postMetadata} * { color: var(--xmin-nav-color, revert-layer) !important; text-transform: lowercase !important }
     ${postMetadata} time { text-transform: none !important }
-    ${postMetadata}, ${postMetadata} *, [data-xmin-counts], [data-xmin-counts] [data-xmin-count],
-    [data-xmin-counts] [data-xmin-count]::after, ${replyComposer} ${replyPlaceholder} {
+    ${postMetadata}, ${postMetadata} *, ${minimal} [data-xmin-counts], ${minimal} [data-xmin-counts] [data-xmin-count],
+    ${minimal} [data-xmin-counts] [data-xmin-count]::after, ${replyComposer} ${replyPlaceholder} {
       font: 400 var(--xmin-label-size)/20px ${font} !important;
     }
     ${replyComposer}:not(:focus-within):has(${replyPlaceholder}) :is(.DraftEditor-root, .DraftEditor-editorContainer, [data-testid="tweetTextarea_0RichTextInputContainer"], [data-testid="tweetTextarea_0"]) {
@@ -148,23 +152,23 @@
       min-height: 20px !important;
     }
 
-    [data-xmin-counts] {
+    ${minimal} [data-xmin-counts] {
       display: flex !important;
       align-items: baseline !important;
       justify-content: flex-start !important;
       flex-wrap: wrap !important;
       gap: 0 6px !important;
     }
-    [data-xmin-counts] > :not([data-xmin-slot]), [data-xmin-counts] [data-xmin-count]:not([data-xmin-count="share"]) > * { display: none !important }
+    ${minimal} [data-xmin-counts] > :not([data-xmin-slot]), ${minimal} [data-xmin-counts] [data-xmin-count]:not([data-xmin-count="share"]) > * { display: none !important }
     /* X uses the native icon wrapper to position the share menu. */
-    [data-xmin-counts] [data-xmin-count="share"] > * {
+    ${minimal} [data-xmin-counts] [data-xmin-count="share"] > * {
       display: flex !important;
       position: absolute !important;
       inset: 0;
       opacity: 0 !important;
       pointer-events: none;
     }
-    [data-xmin-counts] > [data-xmin-slot] {
+    ${minimal} [data-xmin-counts] > [data-xmin-slot] {
       display: inline-flex !important;
       flex: 0 0 auto !important;
       flex-direction: row !important;
@@ -173,12 +177,13 @@
       min-width: 0 !important;
       margin: 0 !important;
     }
-    [data-xmin-slot="like"] { order: -3 }
-    [data-xmin-slot="repost"] { order: -2 }
-    [data-xmin-slot="reply"] { order: -1 }
-    [data-xmin-slot="share"] { order: 1 }
-    [data-xmin-counts] > :is([data-xmin-slot="repost"], [data-xmin-slot="reply"], [data-xmin-slot="save"], [data-xmin-slot="share"])::before { content: "·"; opacity: .55; margin-inline-end: 6px }
-    [data-xmin-counts] [data-xmin-count] {
+    ${minimal} [data-xmin-slot="like"] { order: -3 }
+    ${minimal} [data-xmin-slot="repost"] { order: -2 }
+    ${minimal} [data-xmin-slot="reply"] { order: -1 }
+    ${minimal} [data-xmin-slot="share"] { order: 1 }
+    ${minimal} [data-xmin-slot="delete"] { order: 2 }
+    ${minimal} [data-xmin-counts] > :is([data-xmin-slot="repost"], [data-xmin-slot="reply"], [data-xmin-slot="save"], [data-xmin-slot="share"], [data-xmin-slot="delete"])::before { content: "·"; opacity: .55; margin-inline-end: 6px }
+    ${minimal} [data-xmin-counts] [data-xmin-count] {
       display: inline-flex !important;
       align-items: baseline !important;
       min-height: 24px !important;
@@ -187,13 +192,14 @@
       position: relative !important;
       white-space: nowrap;
     }
-    [data-xmin-slot="like"] [data-xmin-count]::before { content: ""; position: absolute; inset: -2px; cursor: pointer }
-    [data-xmin-slot="like"] [data-testid="unlike"]::after { color: rgb(249, 24, 128); opacity: 1 !important }
-    [data-xmin-fallback-save] button { border: 0; margin: 0; color: inherit; cursor: pointer }
-    [data-xmin-counts] [data-xmin-count]::after { content: attr(data-xmin-count); opacity: var(--xmin-label-opacity) }
-    html :is(:hover, a:hover *, button:hover *, [role="link"]:hover *),
-    html :hover::before, html :hover::after { text-decoration-line: none !important }
-    [data-xmin-counts] [data-xmin-count]:focus-visible { outline: 2px solid currentColor; outline-offset: 2px }
+    ${minimal} [data-xmin-slot="like"] [data-xmin-count]::before { content: ""; position: absolute; inset: -2px; cursor: pointer }
+    ${minimal} [data-xmin-slot="like"] [data-testid="unlike"]::after { color: rgb(249, 24, 128); opacity: 1 !important }
+    ${minimal} [data-xmin-fallback-save] button, ${minimal} [data-xmin-delete-post] { border: 0; margin: 0; color: inherit; cursor: pointer }
+    html[data-xmin-opening-delete] [role="menu"]:has([data-testid="Dropdown"]) { opacity: 0 !important }
+    ${minimal} [data-xmin-counts] [data-xmin-count]::after { content: attr(data-xmin-count); opacity: var(--xmin-label-opacity) }
+    ${minimal} :is(:hover, a:hover *, button:hover *, [role="link"]:hover *),
+    ${minimal} :hover::before, ${minimal} :hover::after { text-decoration-line: none !important }
+    ${minimal} [data-xmin-counts] [data-xmin-count]:focus-visible { outline: 2px solid currentColor; outline-offset: 2px }
   `)
 
   const nativeLinks = [
@@ -203,7 +209,7 @@
   ]
   const customLinks = [
     ['bookmarks', '/i/history', 4], ['likes', '/i/history/likes', 5],
-    ['write', '/compose/post', 7], ['search', '/explore', 8]
+    ['settings', '/settings', 7], ['write', '/compose/post', 8], ['search', '/explore', 9]
   ]
   const kinds = {
     like: 'like', unlike: 'like', reply: 'reply',
@@ -215,6 +221,7 @@
   const group = '[role="group"]'
   const formatter = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 })
   const pendingGroups = new Set()
+  let ownProfile = ''
   let layout = []
   let scheduled = false
   let searchDeadline = 0
@@ -236,7 +243,7 @@
   let readingPosition, zoomFrame, zoomUntil
 
   function remember_reading_position() {
-    if (zoomUntil || (devicePixelRatio || 1) !== density || !layout[1]) return
+    if (document.documentElement?.hasAttribute('data-xmin-native') || zoomUntil || (devicePixelRatio || 1) !== density || !layout[1]) return
     const y = window.scrollY
     const post = y > 0 && [...layout[1].querySelectorAll(tweet)].find(el => el.getBoundingClientRect().bottom > 0)
     const rect = post && post.getBoundingClientRect()
@@ -275,7 +282,7 @@
     if (!root) return
     root.style.setProperty('--xmin-right', `${right}%`)
     root.style.setProperty('--xmin-scale', zoomScale)
-    if (zoomChanged && readingPosition && !root.hasAttribute('data-xmin-chat')) {
+    if (zoomChanged && readingPosition && !root.hasAttribute('data-xmin-native')) {
       cancelAnimationFrame(zoomFrame)
       zoomUntil = performance.now() + 800
       zoomFrame = requestAnimationFrame(restore_reading_position)
@@ -336,7 +343,7 @@
       const row = navigation.querySelector(`:scope > ${selector}:not([data-xmin-link])`)
       if (!row) continue
       label_control(row, label)
-      row.style.order = [0, 1, 2, 3, 6][index]
+      row.style.setProperty('--xmin-nav-order', [0, 1, 2, 3, 6][index])
       if (index === 2 || index === 3) {
         const badge = row.querySelector('[aria-live], [data-testid*="badge" i]')
         const hint = (badge?.textContent.trim() || badge?.getAttribute('aria-label') || '').match(/\d+\+?/)?.[0] || ''
@@ -353,7 +360,7 @@
         link.href = href
         label_control(link, label)
         link.dataset.xminLink = label
-        link.style.order = order
+        link.style.setProperty('--xmin-nav-order', order)
         if (label === 'write' || label === 'search') link.addEventListener('click', event => {
           if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
           if (label === 'write' ? open_native_composer() : open_native_search()) event.preventDefault()
@@ -485,7 +492,7 @@
 
   function apply_layout_percentages(navigation, column, path) {
     const shell = column?.closest('[data-xmin-shell]')
-    if (!navigation || !shell || document.documentElement.hasAttribute('data-xmin-chat')) return
+    if (!navigation || !shell || document.documentElement.hasAttribute('data-xmin-native')) return
     const frame = shell.getBoundingClientRect()
     if (!frame.width) return
     const author = column.querySelector(`${cell} ${tweet} ${avatar}`)
@@ -546,6 +553,75 @@
     slots.set('save', [slot, slot.firstElementChild, 'bookmark'])
   }
 
+  function wait_for_post_ui(find, timeout) {
+    return new Promise(resolve => {
+      const observer = new MutationObserver(check)
+      const timer = setTimeout(() => finish(null), timeout)
+      function finish(result) {
+        observer.disconnect()
+        clearTimeout(timer)
+        resolve(result)
+      }
+      function check() {
+        const result = find()
+        if (result) finish(result)
+      }
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['aria-expanded'] })
+      check()
+    })
+  }
+
+  function get_post_author(post) {
+    return post?.querySelector('[data-testid="User-Name"] a[href^="/"]')?.getAttribute('href')?.toLowerCase()
+  }
+
+  async function open_post_delete_confirmation(post) {
+    const caret = post?.querySelector('[data-testid="caret"]')
+    const accountPath = document.querySelector(profileLink)?.pathname.toLowerCase()
+    const root = document.documentElement
+    const menuSelector = '[role="menu"]:has([data-testid="Dropdown"])'
+    if (!caret || !accountPath || get_post_author(post) !== accountPath ||
+      root.hasAttribute('data-xmin-opening-delete') || document.querySelector(menuSelector)) return
+    root.setAttribute('data-xmin-opening-delete', '')
+    try {
+      caret.click()
+      const item = await wait_for_post_ui(() => {
+        if (caret.getAttribute('aria-expanded') !== 'true') return null
+        const items = document.querySelectorAll(`${menuSelector} [role="menuitem"]`)
+        return [...items].find(el => el.dataset.testid === 'delete' || /^delete(?: post)?$/i.test(el.textContent.trim()))
+      }, 1500)
+      if (item && post.isConnected && get_post_author(post) === document.querySelector(profileLink)?.pathname.toLowerCase()) item.click()
+      else if (caret.getAttribute('aria-expanded') === 'true') caret.click()
+    } finally {
+      root.removeAttribute('data-xmin-opening-delete')
+    }
+  }
+
+  function add_post_delete_action(row, slots) {
+    let slot = row.querySelector(':scope > [data-xmin-slot="delete"]')
+    const post = row.closest(tweet)
+    if (!ownProfile || get_post_author(post) !== ownProfile || !post.querySelector('[data-testid="caret"]')) {
+      slot?.remove()
+      return
+    }
+    if (!slot) {
+      slot = document.createElement('div')
+      slot.dataset.xminSlot = 'delete'
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.setAttribute('data-xmin-delete-post', '')
+      button.setAttribute('aria-label', 'delete post')
+      button.dataset.xminCount = 'delete'
+      button.addEventListener('click', event => {
+        event.stopPropagation()
+        void open_post_delete_confirmation(button.closest(tweet))
+      })
+      slot.append(button)
+      row.append(slot)
+    }
+    slots.set('delete', [slot, slot.firstElementChild])
+  }
+
   function style_post_actions(row) {
     if (!row.isConnected || !(row.closest(tweet) || (location.pathname.includes('/status/') && row.closest(primary)))) return
     const slots = new Map()
@@ -565,12 +641,14 @@
       return
     }
     add_narrow_save(row, slots)
+    add_post_delete_action(row, slots)
     row.setAttribute('data-xmin-counts', '')
     const usedSlots = new Set(countSlots)
     for (const [kind, [slot, button, id]] of slots) {
       if (!countSlots.includes(slot)) usedSlots.add(slot)
       else if (kind === 'save') continue
       slot.dataset.xminSlot = kind
+      if (kind === 'delete') continue
       const label = kind === 'share' ? 'share' : kind === 'save' ? (id === 'removeBookmark' || /^remove /i.test(button.getAttribute('aria-label') || '') ? 'saved' : 'save') : format_post_count(button, kind)
       if (button.dataset.xminCount !== label) button.dataset.xminCount = label
     }
@@ -587,7 +665,7 @@
 
   function sync_page_route() {
     const path = location.pathname.replace(/\/$/, '')
-    document.documentElement?.toggleAttribute('data-xmin-chat', /^\/(?:i\/chat|messages)(?:\/|$)/.test(path))
+    document.documentElement?.toggleAttribute('data-xmin-native', nativeRoute.test(path))
     document.documentElement?.toggleAttribute('data-xmin-home', path === '/home')
     document.documentElement?.toggleAttribute('data-xmin-post', path.includes('/status/'))
     return path
@@ -599,6 +677,18 @@
     requestAnimationFrame(() => {
       scheduled = false
       const path = sync_page_route()
+      if (document.documentElement.hasAttribute('data-xmin-native')) {
+        readingPosition = null
+        if (zoomUntil) finish_zoom()
+        searchDeadline = 0
+        pendingGroups.clear()
+        return
+      }
+      const accountPath = document.querySelector(profileLink)?.pathname.toLowerCase() || ''
+      if (ownProfile !== accountPath) {
+        ownProfile = accountPath
+        queue_post_groups(document.querySelector(primary))
+      }
       const navigation = document.querySelector(`${nav}:has(a[href="/home"])`)
       const column = document.querySelector(primary)
       mark_layout_paths(navigation, column)
@@ -624,12 +714,14 @@
 
   new MutationObserver(records => {
     for (const record of records) {
-      const row = (record.target.nodeType === Node.ELEMENT_NODE ? record.target : record.target.parentElement)?.closest?.(group)
+      const target = record.target.nodeType === Node.ELEMENT_NODE ? record.target : record.target.parentElement
+      const row = target?.closest?.(group)
       if (row) pendingGroups.add(row)
+      else if (record.type !== 'characterData') target?.closest?.(tweet)?.querySelectorAll('[data-xmin-counts]').forEach(row => pendingGroups.add(row))
       record.addedNodes.forEach(queue_post_groups)
     }
     schedule_page_update()
-  }).observe(document, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['aria-label', 'data-testid'] })
+  }).observe(document, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['aria-label', 'data-testid', 'href'] })
 
   function update_after_navigation() {
     sync_page_route()
@@ -655,7 +747,7 @@
 
   window.addEventListener('keydown', event => {
     if (event.defaultPrevented || event.repeat || event.ctrlKey || event.metaKey || event.altKey ||
-      !document.querySelector('[data-xmin-nav]') || !['n', '/'].includes(event.key) || document.documentElement.hasAttribute('data-xmin-chat') ||
+      !document.querySelector('[data-xmin-nav]') || !['n', '/'].includes(event.key) || document.documentElement.hasAttribute('data-xmin-native') ||
       event.target.closest?.('input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"]') ||
       document.querySelector('[aria-modal="true"]')) return
     if (event.key === 'n' ? !open_native_composer() : !open_native_search()) return
